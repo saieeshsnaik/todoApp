@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:todoapp/pag2.dart';
+import 'addtask.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           itemCount: 10,
           itemBuilder: (context, index) {
             return Card(
-              color: Color.fromARGB(204, 255, 255, 255),
+              color: const Color.fromARGB(255, 255, 255, 255),
               shape: const RoundedRectangleBorder(
                   // side: BorderSide(width: 2),
                   borderRadius: BorderRadius.all(Radius.circular(18))),
@@ -64,11 +64,11 @@ class _HomePageState extends State<HomePage> {
                     isThreeLine: true,
                     onTap: () {
                       setState(() {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Myapp2()),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => ),
+                        // );
                       });
                     },
                   ),
@@ -90,6 +90,19 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          setState(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddTask()),
+            );
+          });
+        },
+        label: const Text("Add Task"),
+        icon: const Icon(Icons.add),
+        backgroundColor: color2,
       ),
     );
   }
