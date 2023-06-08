@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           itemCount: 10,
           itemBuilder: (context, index) {
             return Card(
-              color: Colors.white,
+              color: Color.fromARGB(204, 255, 255, 255),
               shape: const RoundedRectangleBorder(
                   // side: BorderSide(width: 2),
                   borderRadius: BorderRadius.all(Radius.circular(18))),
@@ -47,7 +47,9 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   ListTile(
                     shape: const RoundedRectangleBorder(
-                        // side: BorderSide(width: 2),
+                        // side: BorderSide(
+                        //     width: 1,S
+                        //     color: Color.fromARGB(132, 190, 169, 169)),
                         borderRadius: BorderRadius.all(Radius.circular(18))),
                     title: const Text(
                       "Task Name",
@@ -70,10 +72,15 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                   ),
+                  const Divider(
+                    thickness: 2,
+                  ),
                   Row(
                     children: [
                       IconButton(
-                          onPressed: () {}, icon: const Icon(Icons.edit)),
+                        onPressed: () {},
+                        icon: const Icon(Icons.edit),
+                      ),
                       IconButton(
                           onPressed: () {}, icon: const Icon(Icons.delete)),
                     ],
