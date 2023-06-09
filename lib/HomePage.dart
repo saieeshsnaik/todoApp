@@ -42,6 +42,20 @@ class _HomePageState extends State<HomePage> {
     print(_TodoList);
   }
 
+  //detete method
+  void _deleteitem(int id) async {
+    await SQLHelper.deleteItem(id);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text(
+        'Task Deleted!',
+        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+      ),
+      backgroundColor: Colors.white,
+    ));
+
+    _refreshJournals();
+  }
+
   var value = "hello";
 
   Color color1 =
@@ -288,7 +302,10 @@ class _HomePageState extends State<HomePage> {
                         icon: const Icon(Icons.edit),
                       ),
                       IconButton(
-                          onPressed: () {}, icon: const Icon(Icons.delete)),
+                          onPressed: () {
+                            _deleteitem(_TodoList[index]['ID']);
+                          },
+                          icon: const Icon(Icons.delete)),
                     ],
                   )
                 ],
