@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:indexed/indexed.dart';
+import 'package:todoapp/HomePage.dart';
+
+import 'createtask.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
-
   @override
   State<Homepage> createState() => _HomepageState();
 }
@@ -20,6 +22,18 @@ class _HomepageState extends State<Homepage> {
 
   Color addButtonColor =
       Color(int.parse("#3787EB".substring(1, 7), radix: 16) + 0xFF000000);
+
+  void showForm() async {
+    // Container(
+    //   height: double.infinity,
+    //   color: Colors.amber,
+    //   child: const Card(
+    //     color: Colors.white,
+    //     child: Text("hello"),
+    //   ),
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,7 +120,7 @@ class _HomepageState extends State<Homepage> {
                                     style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 13,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w500,
                                         color: Colors.black),
                                   ),
                                 ),
@@ -116,6 +130,85 @@ class _HomepageState extends State<Homepage> {
                                 endIndent: 15,
                                 thickness: 0.9,
                                 color: Colors.grey,
+                              ),
+                              Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 16.0, bottom: 16.0),
+                                    child: Text(
+                                      "Date: 2023-06-12",
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 8.0, bottom: 16.0),
+                                    child: Text(
+                                      "Time: 9:00am",
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 72.0, bottom: 16.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.grey,
+                                              blurRadius: 08,
+                                              blurStyle: BlurStyle.outer,
+                                            )
+                                          ]),
+                                      child: CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.white,
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.black),
+                                          iconSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0, bottom: 16.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 08,
+                                                blurStyle: BlurStyle.outer)
+                                          ]),
+                                      child: CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.white,
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.black,
+                                          ),
+                                          iconSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ],
                           ),
@@ -134,7 +227,15 @@ class _HomepageState extends State<Homepage> {
               bottom: 35,
               left: 167,
               child: FloatingActionButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreateTask(),
+                        ));
+                  });
+                },
                 backgroundColor: addButtonColor,
                 child: const Icon(
                   Icons.add,
