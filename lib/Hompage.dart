@@ -79,142 +79,146 @@ class _HomepageState extends State<Homepage> {
                           offset: Offset(0.0, 0.75))
                     ],
                   ),
-                  child: ListView.builder(
-                    itemCount: 1,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.only(left: 5.0, right: 5.0),
-                        child: Card(
-                          color: Colors.white,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: ListTile(
-                                  // tileColor: Colors.amberAccent,
-                                  leading: Container(
-                                    height: 70.0,
-                                    width: 60.0,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(6.0),
-                                      color: addButtonColor,
-                                    ),
-                                    child: Container(
-                                      margin: EdgeInsets.all(8.0),
-                                      child: const ImageIcon(
-                                        AssetImage(
-                                            'Assets/icons/list_icon.png'),
-                                        color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: ListView.builder(
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.only(left: 5.0, right: 5.0),
+                          child: Card(
+                            color: Colors.white,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: ListTile(
+                                    // tileColor: Colors.amberAccent,
+                                    leading: Container(
+                                      height: 70.0,
+                                      width: 60.0,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(6.0),
+                                        color: addButtonColor,
+                                      ),
+                                      child: Container(
+                                        margin: EdgeInsets.all(8.0),
+                                        child: const ImageIcon(
+                                          AssetImage(
+                                              'Assets/icons/list_icon.png'),
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  title: const Text(
-                                    'Task Name',
-                                    style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  subtitle: const Text(
-                                    'Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn',
-                                    style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black),
+                                    title: const Text(
+                                      'Task Name',
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    subtitle: const Text(
+                                      'Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn',
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                thickness: 0.9,
-                                color: Colors.grey,
-                              ),
-                              Row(
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 16.0, bottom: 16.0),
-                                    child: Text(
-                                      "Date: 2023-06-12",
-                                      style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 8.0, bottom: 16.0),
-                                    child: Text(
-                                      "Time: 9:00am",
-                                      style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 72.0, bottom: 16.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Colors.grey,
-                                              blurRadius: 08,
-                                              blurStyle: BlurStyle.outer,
-                                            )
-                                          ]),
-                                      child: CircleAvatar(
-                                        radius: 15,
-                                        backgroundColor: Colors.white,
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.edit,
-                                              color: Colors.black),
-                                          iconSize: 15,
-                                        ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  thickness: 0.9,
+                                  color: Colors.grey,
+                                ),
+                                Row(
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 16.0, bottom: 16.0),
+                                      child: Text(
+                                        "Date: 2023-06-12",
+                                        style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 16.0, bottom: 16.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: const [
-                                            BoxShadow(
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 8.0, bottom: 16.0),
+                                      child: Text(
+                                        "Time: 9:00am",
+                                        style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 72.0, bottom: 16.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            boxShadow: const [
+                                              BoxShadow(
                                                 color: Colors.grey,
                                                 blurRadius: 08,
-                                                blurStyle: BlurStyle.outer)
-                                          ]),
-                                      child: CircleAvatar(
-                                        radius: 15,
-                                        backgroundColor: Colors.white,
-                                        child: IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.black,
+                                                blurStyle: BlurStyle.outer,
+                                              )
+                                            ]),
+                                        child: CircleAvatar(
+                                          radius: 15,
+                                          backgroundColor: Colors.white,
+                                          child: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.edit,
+                                                color: Colors.black),
+                                            iconSize: 15,
                                           ),
-                                          iconSize: 15,
                                         ),
                                       ),
                                     ),
-                                  )
-                                ],
-                              ),
-                            ],
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 16.0, bottom: 16.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 08,
+                                                  blurStyle: BlurStyle.outer)
+                                            ]),
+                                        child: CircleAvatar(
+                                          radius: 15,
+                                          backgroundColor: Colors.white,
+                                          child: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.black,
+                                            ),
+                                            iconSize: 15,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
