@@ -3,6 +3,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:indexed/indexed.dart';
 import 'package:todoapp/HomePage.dart';
+import 'package:todoapp/sqlhelper.dart';
+import 'package:intl/intl.dart';
 
 import 'createtask.dart';
 
@@ -13,6 +15,284 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  List<Map<String, dynamic>> _TodoList = [];
+  bool _isLoading = true;
+
+  void _refreshJournals() async {
+    final data = await SQLHelper.getItems();
+    setState(() {
+      _TodoList = data;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _refreshJournals();
+    print("number of items ${_TodoList.length}");
+  }
+
+  Future<void> _addItem() async {
+    await SQLHelper.createItem(
+        _taskNameController.value.text,
+        _taskDescController.value.text,
+        _taskDateController.value.text,
+        _taskTimeController.value.text);
+    _refreshJournals();
+    print("number of items ${_TodoList.length}");
+    print(_TodoList);
+  }
+
+  //update item
+  Future<void> __updateItem(int id) async {
+    await SQLHelper.updateItem(
+        id,
+        _taskNameController.value.text,
+        _taskDescController.value.text,
+        _taskDateController.value.text,
+        _taskTimeController.value.text);
+    _refreshJournals();
+  }
+
+  //detete method
+  void _deleteitem(int id) async {
+    await SQLHelper.deleteItem(id);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text(
+        'Task Deleted!',
+        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+      ),
+      backgroundColor: Colors.white,
+    ));
+
+    _refreshJournals();
+  }
+
+  void showmodel([int? id]) async {
+    if (id != null) {
+      final existingJournal =
+          _TodoList.firstWhere((element) => element['ID'] == id);
+      _taskNameController.text = existingJournal['TASKNAME'];
+      _taskDescController.text = existingJournal['DESCRIPTION'];
+      _taskDateController.text = existingJournal['DATE'];
+      _taskTimeController.text = existingJournal['TIME'];
+    }
+    showModalBottomSheet(
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        height: double.infinity,
+        width: double.infinity,
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const SizedBox(
+              height: 90,
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade200,
+                    ),
+                    child: BackButton(
+                      color: Colors.grey.shade400,
+                      onPressed: () {
+                        setState(() {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Homepage(),
+                              ));
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 60),
+                  child: Text(
+                    'Create New Task',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Text(
+                  'Task Name',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _taskNameController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade100)),
+                    hintText: '',
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Text(
+                  'Select Date',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _taskDateController,
+                  decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        iconSize: 30,
+                        color: Colors.blue.shade300,
+                        icon: const Icon(Icons.calendar_month),
+                        onPressed: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1950),
+                            lastDate: DateTime(2100),
+                          );
+                          String formattedDate =
+                              DateFormat('yyyy-MM-dd').format(pickedDate!);
+                          setState(() {
+                            _taskDateController.text = formattedDate;
+                          });
+                          // Icon Calender Acction
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: Colors.grey.shade100)),
+                      hintText: 'YYYY-MM-DD',
+                      hintStyle: const TextStyle(
+                          fontFamily: 'Inter', fontWeight: FontWeight.w500)),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Text(
+                  'Select Time',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _taskTimeController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: Colors.grey.shade100)),
+                      hintText: 'HH:MM:SS',
+                      hintStyle: const TextStyle(
+                          fontFamily: 'Inter', fontWeight: FontWeight.w500)),
+                  onTap: () async {
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      initialTime: TimeOfDay.now(),
+                      context: context,
+                    );
+                    DateTime parsedTime = DateFormat.jm()
+                        .parse(pickedTime!.format(context).toString());
+                    String formattedTime =
+                        DateFormat('HH:mm:ss').format(parsedTime);
+
+                    setState(() {
+                      _taskTimeController.text = formattedTime;
+                    });
+                  },
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Text(
+                  'Description',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _taskDescController,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade100)),
+                    hintText: 'Description',
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (id != null) {
+                          _addItem();
+                          Navigator.of(context).pop();
+                          _taskNameController.text = '';
+                          _taskTimeController.text = '';
+                          _taskDescController.text = '';
+                          _taskDateController.text = '';
+                        } else {
+                          __updateItem(id!);
+                        }
+                      });
+                    },
+                    child: const Text('Create Task'),
+                  ),
+                ),
+              ),
+            ]),
+          ]),
+        ),
+      ),
+    );
+  }
+
   Color colorbg1 =
       Color(int.parse("#298BFF".substring(1, 7), radix: 16) + 0xFF000000);
   Color colorbg2 =
@@ -23,16 +303,11 @@ class _HomepageState extends State<Homepage> {
   Color addButtonColor =
       Color(int.parse("#3787EB".substring(1, 7), radix: 16) + 0xFF000000);
 
-  void showForm() async {
-    // Container(
-    //   height: double.infinity,
-    //   color: Colors.amber,
-    //   child: const Card(
-    //     color: Colors.white,
-    //     child: Text("hello"),
-    //   ),
-    // );
-  }
+  TextEditingController dateInput = TextEditingController();
+  final TextEditingController _taskNameController = TextEditingController();
+  final TextEditingController _taskDescController = TextEditingController();
+  final TextEditingController _taskDateController = TextEditingController();
+  final TextEditingController _taskTimeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +357,7 @@ class _HomepageState extends State<Homepage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: ListView.builder(
-                      itemCount: 6,
+                      itemCount: _TodoList.length,
                       itemBuilder: (context, index) {
                         return Container(
                           margin: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -111,16 +386,16 @@ class _HomepageState extends State<Homepage> {
                                         ),
                                       ),
                                     ),
-                                    title: const Text(
-                                      'Task Name',
-                                      style: TextStyle(
+                                    title: Text(
+                                      _TodoList[index]['TASKNAME'],
+                                      style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    subtitle: const Text(
-                                      'Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn Lorem epsumn',
-                                      style: TextStyle(
+                                    subtitle: Text(
+                                      _TodoList[index]['DESCRIPTION'],
+                                      style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
@@ -136,23 +411,23 @@ class _HomepageState extends State<Homepage> {
                                 ),
                                 Row(
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(
+                                    Padding(
+                                      padding: const EdgeInsets.only(
                                           left: 16.0, bottom: 16.0),
                                       child: Text(
-                                        "Date: 2023-06-12",
-                                        style: TextStyle(
+                                        'Date: ${_TodoList[index]['DATE']}',
+                                        style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600),
                                       ),
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.only(
+                                    Padding(
+                                      padding: const EdgeInsets.only(
                                           left: 8.0, bottom: 16.0),
                                       child: Text(
-                                        "Time: 9:00am",
-                                        style: TextStyle(
+                                        'Time: ${_TodoList[index]['TIME']}',
+                                        style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600),
@@ -176,7 +451,9 @@ class _HomepageState extends State<Homepage> {
                                           radius: 15,
                                           backgroundColor: Colors.white,
                                           child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              showmodel(_TodoList[index]['ID']);
+                                            },
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
                                             iconSize: 15,
@@ -201,7 +478,10 @@ class _HomepageState extends State<Homepage> {
                                           radius: 15,
                                           backgroundColor: Colors.white,
                                           child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _deleteitem(
+                                                  _TodoList[index]['ID']);
+                                            },
                                             icon: const Icon(
                                               Icons.delete,
                                               color: Colors.black,
@@ -233,11 +513,12 @@ class _HomepageState extends State<Homepage> {
               child: FloatingActionButton(
                 onPressed: () {
                   setState(() {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CreateTask(),
-                        ));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => const CreateTask(),
+                    //     ));
+                    showmodel();
                   });
                 },
                 backgroundColor: addButtonColor,

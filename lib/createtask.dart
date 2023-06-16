@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:todoapp/Hompage.dart';
+import 'package:todoapp/sqlhelper.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -170,7 +171,15 @@ class _CreateTaskState extends State<CreateTask> {
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Homepage(),
+                            ));
+                      });
+                    },
                     child: const Text('Create Task'),
                   ),
                 ),
