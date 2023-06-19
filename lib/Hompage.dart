@@ -129,11 +129,11 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 60),
+                Padding(
+                  padding: const EdgeInsets.only(left: 60),
                   child: Text(
-                    'Create New Task',
-                    style: TextStyle(
+                    id != null ? 'Update Task' : 'Create New Task',
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
