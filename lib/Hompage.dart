@@ -31,7 +31,6 @@ class _HomepageState extends State<Homepage> {
     // TODO: implement initState
     super.initState();
     _refreshJournals();
-    print("number of items ${_TodoList.length}");
   }
 
   Future<void> _addItem() async {
@@ -41,8 +40,6 @@ class _HomepageState extends State<Homepage> {
         _taskDateController.value.text,
         _taskTimeController.value.text);
     _refreshJournals();
-    print("number of items ${_TodoList.length}");
-    print(_TodoList);
   }
 
   //update item
@@ -57,15 +54,29 @@ class _HomepageState extends State<Homepage> {
   }
 
   //detete method
-  void _deleteitem(int id) async {
+  void _deleteitem(int id, String taskname) async {
     await SQLHelper.deleteItem(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text(
-        'Task Deleted!',
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
-      ),
-      backgroundColor: Colors.white,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          '$taskname Task Deleted!',
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+        ),
+        backgroundColor: colorbg1));
+    // AlertDialog(
+    //   title: const Text(''),
+    //   content: Text('Task "$taskname" Deleted Successfully! '),
+    //   actions: <Widget>[
+    //     TextButton(
+    //       onPressed: () => Navigator.pop(context, 'Cancel'),
+    //       child: const Text('Cancel'),
+    //     ),
+    //     TextButton(
+    //       onPressed: () => Navigator.pop(context, 'OK'),
+    //       child: const Text('OK'),
+    //     ),
+    //   ],
+    // );
 
     _refreshJournals();
   }
@@ -270,7 +281,7 @@ class _HomepageState extends State<Homepage> {
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        if (id != null) {
+                        if (id == null) {
                           _addItem();
                           Navigator.of(context).pop();
                           _taskNameController.text = '';
@@ -278,11 +289,22 @@ class _HomepageState extends State<Homepage> {
                           _taskDescController.text = '';
                           _taskDateController.text = '';
                         } else {
-                          __updateItem(id!);
+                          __updateItem(id);
+                          Navigator.of(context).pop();
+                          _taskNameController.text = '';
+                          _taskTimeController.text = '';
+                          _taskDescController.text = '';
+                          _taskDateController.text = '';
                         }
                       });
                     },
-                    child: const Text('Create Task'),
+                    child: Text(
+                      id != null ? 'Update Task' : 'Create New Task',
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
               ),
@@ -378,7 +400,7 @@ class _HomepageState extends State<Homepage> {
                                         color: addButtonColor,
                                       ),
                                       child: Container(
-                                        margin: EdgeInsets.all(8.0),
+                                        margin: const EdgeInsets.all(8.0),
                                         child: const ImageIcon(
                                           AssetImage(
                                               'Assets/icons/list_icon.png'),
@@ -480,7 +502,8 @@ class _HomepageState extends State<Homepage> {
                                           child: IconButton(
                                             onPressed: () {
                                               _deleteitem(
-                                                  _TodoList[index]['ID']);
+                                                  _TodoList[index]['ID'],
+                                                  _TodoList[index]['TASKNAME']);
                                             },
                                             icon: const Icon(
                                               Icons.delete,
