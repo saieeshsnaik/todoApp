@@ -38,7 +38,7 @@ class SQLHelper {
 
   static Future<List<Map<String, dynamic>>> getItems() async {
     final db = await SQLHelper.db();
-    return db.query('TODOLIST', orderBy: "ID");
+    return db.query('TODOLIST', orderBy: "DATE");
   }
 
   static Future<int> updateItem(int id, String title, String? description,

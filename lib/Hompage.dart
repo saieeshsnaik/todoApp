@@ -5,6 +5,7 @@ import 'package:indexed/indexed.dart';
 import 'package:todoapp/HomePage.dart';
 import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
 import 'createtask.dart';
 
@@ -81,6 +82,39 @@ class _HomepageState extends State<Homepage> {
     _refreshJournals();
   }
 
+  showAlertDialog(BuildContext context, int idtask, String taskName) {
+    // set up the buttons
+    Widget cancelButton = ElevatedButton(
+      child: const Text("No"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = ElevatedButton(
+      child: const Text("Yes"),
+      onPressed: () {
+        _deleteitem(idtask, taskName);
+        Navigator.of(context).pop();
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Alert!"),
+      content: Text('Would you like to Delete Task "$taskName"'),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   void showmodel([int? id]) async {
     if (id != null) {
       final existingJournal =
@@ -132,7 +166,7 @@ class _HomepageState extends State<Homepage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 60),
                   child: Text(
-                    id != null ? 'Update Task' : 'Create New Task',
+                    id != null ? 'Update Existing Task' : 'Create New Task',
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 20,
@@ -191,11 +225,14 @@ class _HomepageState extends State<Homepage> {
                           DateTime? pickedDate = await showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
-                            firstDate: DateTime(1950),
+                            firstDate: DateTime.now(),
                             lastDate: DateTime(2100),
                           );
                           String formattedDate =
                               DateFormat('yyyy-MM-dd').format(pickedDate!);
+
+                          // String formattedDateTwo =
+                          //     DateFormat('yyyy-MM-dd').format(DateTime.now());
                           setState(() {
                             _taskDateController.text = formattedDate;
                           });
@@ -236,13 +273,27 @@ class _HomepageState extends State<Homepage> {
                       initialTime: TimeOfDay.now(),
                       context: context,
                     );
+
+                    //Extracting Am Or Pm From time
+                    String period = pickedTime!.period.toString();
+                    String pr = period.substring(10, 12);
+
                     DateTime parsedTime = DateFormat.jm()
                         .parse(pickedTime!.format(context).toString());
                     String formattedTime =
-                        DateFormat('HH:mm:ss').format(parsedTime);
+                        ' ${DateFormat('HH:mm').format(parsedTime)} $pr';
+
+                    //  DateTime parsedTimeTwo = DateFormat.jm()
+                    //     .parse(pickedTime!.format(context).toString());
+                    // String formattedTime =
+                    //     DateFormat('HH:mm:ss').format(parsedTime);
 
                     setState(() {
                       _taskTimeController.text = formattedTime;
+                      // print(
+                      //     int.parse(_taskTimeController.text.substring(0, 3)));
+                      // print(
+                      //     int.parse(_taskTimeController.text.substring(4, 6)));
                     });
                   },
                 ),
@@ -283,6 +334,14 @@ class _HomepageState extends State<Homepage> {
                       setState(() {
                         if (id == null) {
                           _addItem();
+
+                          // Create an alarm at 23:59
+                          FlutterAlarmClock.createAlarm(
+                              int.parse(
+                                  _taskTimeController.text.substring(0, 3)),
+                              int.parse(
+                                  _taskTimeController.text.substring(4, 6)),
+                              title: _taskNameController.text);
                           Navigator.of(context).pop();
                           _taskNameController.text = '';
                           _taskTimeController.text = '';
@@ -457,7 +516,7 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 72.0, bottom: 16.0),
+                                          left: 25.0, bottom: 16.0),
                                       child: Container(
                                         decoration: BoxDecoration(
                                             borderRadius:
@@ -501,7 +560,8 @@ class _HomepageState extends State<Homepage> {
                                           backgroundColor: Colors.white,
                                           child: IconButton(
                                             onPressed: () {
-                                              _deleteitem(
+                                              showAlertDialog(
+                                                  context,
                                                   _TodoList[index]['ID'],
                                                   _TodoList[index]['TASKNAME']);
                                             },
@@ -532,7 +592,7 @@ class _HomepageState extends State<Homepage> {
           ),
           Positioned(
               bottom: 35,
-              left: 167,
+              left: MediaQuery.of(context).size.width * 0.42,
               child: FloatingActionButton(
                 onPressed: () {
                   setState(() {

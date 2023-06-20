@@ -52,6 +52,7 @@ dev_dependencies:
   day_night_time_picker:
   sqflite: ^2.2.8+4
   indexed: ^0.0.8
+  flutter_alarm_clock: ^0.0.2
 
 
 # For information on the generic Dart part of this file, see the
