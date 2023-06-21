@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:indexed/indexed.dart';
-import 'package:todoapp/HomePage.dart';
 import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
@@ -279,7 +278,7 @@ class _HomepageState extends State<Homepage> {
                     String pr = period.substring(10, 12);
 
                     DateTime parsedTime = DateFormat.jm()
-                        .parse(pickedTime!.format(context).toString());
+                        .parse(pickedTime.format(context).toString());
                     String formattedTime =
                         ' ${DateFormat('HH:mm').format(parsedTime)} $pr';
 
