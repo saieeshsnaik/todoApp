@@ -1,34 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:indexed/indexed.dart';
 import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
-import 'createtask.dart';
-
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomepageState extends State<Homepage> {
-  List<Map<String, dynamic>> _TodoList = [];
-  bool _isLoading = true;
+class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> _todolist = [];
+  // bool _isLoading = true;
 
   void _refreshJournals() async {
     final data = await SQLHelper.getItems();
     setState(() {
-      _TodoList = data;
-      _isLoading = false;
+      _todolist = data;
+      // _isLoading = false;
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _refreshJournals();
   }
@@ -56,6 +50,7 @@ class _HomepageState extends State<Homepage> {
   //detete method
   void _deleteitem(int id, String taskname) async {
     await SQLHelper.deleteItem(id);
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
           '$taskname Task Deleted!',
@@ -119,7 +114,7 @@ class _HomepageState extends State<Homepage> {
   void showmodel([int? id]) async {
     if (id != null) {
       final existingJournal =
-          _TodoList.firstWhere((element) => element['ID'] == id);
+          _todolist.firstWhere((element) => element['ID'] == id);
       _taskNameController.text = existingJournal['TASKNAME'];
       _taskDescController.text = existingJournal['DESCRIPTION'];
       _taskDateController.text = existingJournal['DATE'];
@@ -157,7 +152,7 @@ class _HomepageState extends State<Homepage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const Homepage(),
+                                builder: (context) => const HomePage(),
                               ));
                         });
                       },
@@ -280,6 +275,7 @@ class _HomepageState extends State<Homepage> {
                     String pr = period.substring(10, 12);
 
                     DateTime parsedTime = DateFormat.jm()
+                        // ignore: use_build_context_synchronously
                         .parse(pickedTime.format(context).toString());
                     String formattedTime =
                         ' ${DateFormat('HH:mm').format(parsedTime)} $pr';
@@ -440,7 +436,7 @@ class _HomepageState extends State<Homepage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: ListView.builder(
-                      itemCount: _TodoList.length,
+                      itemCount: _todolist.length,
                       itemBuilder: (context, index) {
                         return Container(
                           margin: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -470,14 +466,14 @@ class _HomepageState extends State<Homepage> {
                                       ),
                                     ),
                                     title: Text(
-                                      _TodoList[index]['TASKNAME'],
+                                      _todolist[index]['TASKNAME'],
                                       style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     subtitle: Text(
-                                      _TodoList[index]['DESCRIPTION'],
+                                      _todolist[index]['DESCRIPTION'],
                                       style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 13,
@@ -498,7 +494,7 @@ class _HomepageState extends State<Homepage> {
                                       padding: const EdgeInsets.only(
                                           left: 16.0, bottom: 16.0),
                                       child: Text(
-                                        'Date: ${_TodoList[index]['DATE']}',
+                                        'Date: ${_todolist[index]['DATE']}',
                                         style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
@@ -509,7 +505,7 @@ class _HomepageState extends State<Homepage> {
                                       padding: const EdgeInsets.only(
                                           left: 8.0, bottom: 16.0),
                                       child: Text(
-                                        'Time: ${_TodoList[index]['TIME']}',
+                                        'Time: ${_todolist[index]['TIME']}',
                                         style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
@@ -535,7 +531,7 @@ class _HomepageState extends State<Homepage> {
                                           backgroundColor: Colors.white,
                                           child: IconButton(
                                             onPressed: () {
-                                              showmodel(_TodoList[index]['ID']);
+                                              showmodel(_todolist[index]['ID']);
                                             },
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
@@ -564,8 +560,8 @@ class _HomepageState extends State<Homepage> {
                                             onPressed: () {
                                               showAlertDialog(
                                                   context,
-                                                  _TodoList[index]['ID'],
-                                                  _TodoList[index]['TASKNAME']);
+                                                  _todolist[index]['ID'],
+                                                  _todolist[index]['TASKNAME']);
                                             },
                                             icon: const Icon(
                                               Icons.delete,

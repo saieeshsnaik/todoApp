@@ -50,7 +50,7 @@ packages:
     source: hosted
     version: "1.0.5"
   day_night_time_picker:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: day_night_time_picker
       sha256: "24abed3bcac575fe67308eb1ef8161bbfb93fa4f9742da3e791ad143110d9b6a"
@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "1.2.0+2"
   day_picker:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: day_picker
       sha256: a0f73716d688b3643769db39e7626cae54026bec24c33a8ebf5a6f8c618a05f2
@@ -79,7 +79,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_alarm_clock:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_alarm_clock
       sha256: "6895d7d395c8f040a7043f83575004f79289ba8ccbc0e1aa27e5285795dd6a4b"
@@ -100,7 +100,7 @@ packages:
     source: sdk
     version: "0.0.0"
   indexed:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: indexed
       sha256: "3509a2a7ad1dbd7280da377661129e0b0a2f5e8d6d75f10400f07397f95324df"
@@ -108,7 +108,7 @@ packages:
     source: hosted
     version: "0.0.8"
   intl:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: intl
       sha256: "910f85bce16fb5c6f614e117efa303e85a1731bb0081edf3604a2ae6e9a3cc91"
@@ -177,7 +177,7 @@ packages:
     source: hosted
     version: "1.9.1"
   sqflite:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: sqflite
       sha256: b4d6710e1200e96845747e37338ea8a819a12b51689a3bcf31eff0003b37a0b9
