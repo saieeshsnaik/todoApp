@@ -81,6 +81,8 @@ class _HomepageState extends State<Homepage> {
     _refreshJournals();
   }
 
+  // var parsedDate = DateTime.parse('1974-03-20 00:00:00.000');
+
   showAlertDialog(BuildContext context, int idtask, String taskName) {
     // set up the buttons
     Widget cancelButton = ElevatedButton(
@@ -341,6 +343,7 @@ class _HomepageState extends State<Homepage> {
                               int.parse(
                                   _taskTimeController.text.substring(4, 6)),
                               title: _taskNameController.text);
+
                           Navigator.of(context).pop();
                           _taskNameController.text = '';
                           _taskTimeController.text = '';
