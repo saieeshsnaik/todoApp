@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/sqlhelper.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:indexed/indexed.dart';
+import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
@@ -309,8 +309,8 @@ class _HomePageState extends State<HomePage> {
                     String pr = period.substring(10, 12);
                     // print(period);
 
-                    // DateTime parsedTime = DateFormat.jm()
-                    //     .parse(pickedTime!.format(context).toString());
+                    DateTime parsedTime = DateFormat.jm()
+                        .parse(pickedTime.format(context).toString());
                     String formattedTime =
                         ' ${pickedTime.hour}:${pickedTime.minute} $pr';
 
