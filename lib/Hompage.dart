@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage> {
 
   late String selectedDate;
   late String selectedTime;
-  late DateTime finaldate;
+  // late DateTime finaldate;
   late int hour;
   late int minutes;
   void showmodel([int? id]) async {
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
 
                     String mergeDateTime = '${selectedDate} ${selectedTime}';
 
-                    finaldate = DateTime.parse(mergeDateTime);
+                    // finaldate = DateTime.parse(mergeDateTime);
 
                     print('Final Slected Date time:  $finaldate');
 
@@ -309,8 +309,8 @@ class _HomePageState extends State<HomePage> {
                     String pr = period.substring(10, 12);
                     // print(period);
 
-                    DateTime parsedTime = DateFormat.jm()
-                        .parse(pickedTime.format(context).toString());
+                    // DateTime parsedTime = DateFormat.jm()
+                    //     .parse(pickedTime.format(context).toString());
                     String formattedTime =
                         ' ${pickedTime.hour}:${pickedTime.minute} $pr';
 
