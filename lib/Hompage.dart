@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp/sqlhelper.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:indexed/indexed.dart';
-import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
-import 'createtask.dart';
-
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
   @override
-  State<Homepage> createState() => _HomepageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomepageState extends State<Homepage> {
-  List<Map<String, dynamic>> _TodoList = [];
-  bool _isLoading = true;
+class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> _todolist = [];
+  // bool _isLoading = true;
 
   void _refreshJournals() async {
     final data = await SQLHelper.getItems();
     setState(() {
-      _TodoList = data;
-      _isLoading = false;
+      _todolist = data;
+      // _isLoading = false;
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _refreshJournals();
   }
@@ -56,6 +53,7 @@ class _HomepageState extends State<Homepage> {
   //detete method
   void _deleteitem(int id, String taskname) async {
     await SQLHelper.deleteItem(id);
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
           '$taskname Task Deleted!',
@@ -80,6 +78,8 @@ class _HomepageState extends State<Homepage> {
 
     _refreshJournals();
   }
+
+  // var parsedDate = DateTime.parse('1974-03-20 00:00:00.000');
 
   showAlertDialog(BuildContext context, int idtask, String taskName) {
     // set up the buttons
@@ -114,10 +114,15 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  late String selectedDate;
+  late String selectedTime;
+  late DateTime finaldate;
+  late int hour;
+  late int minutes;
   void showmodel([int? id]) async {
     if (id != null) {
       final existingJournal =
-          _TodoList.firstWhere((element) => element['ID'] == id);
+          _todolist.firstWhere((element) => element['ID'] == id);
       _taskNameController.text = existingJournal['TASKNAME'];
       _taskDescController.text = existingJournal['DESCRIPTION'];
       _taskDateController.text = existingJournal['DATE'];
@@ -127,11 +132,12 @@ class _HomepageState extends State<Homepage> {
       context: context,
       elevation: 5,
       isScrollControlled: true,
-      builder: (_) => Container(
+      builder: (BuildContext context) => Container(
         height: double.infinity,
         width: double.infinity,
         color: Colors.white,
         child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(
@@ -155,7 +161,7 @@ class _HomepageState extends State<Homepage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const Homepage(),
+                                builder: (context) => const HomePage(),
                               ));
                         });
                       },
@@ -227,6 +233,9 @@ class _HomepageState extends State<Homepage> {
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2100),
                           );
+
+                          selectedDate = pickedDate.toString().substring(0, 10);
+                          print("Selectec date $selectedDate");
                           String formattedDate =
                               DateFormat('yyyy-MM-dd').format(pickedDate!);
 
@@ -272,15 +281,38 @@ class _HomepageState extends State<Homepage> {
                       initialTime: TimeOfDay.now(),
                       context: context,
                     );
+                    print(pickedTime);
+                    selectedTime =
+                        '${pickedTime!.hour}:${pickedTime.minute}:00';
+                    print("Selected Time$selectedTime");
+
+                    String mergeDateTime = '${selectedDate} ${selectedTime}';
+
+                    finaldate = DateTime.parse(mergeDateTime);
+
+                    print('Final Slected Date time:  $finaldate');
+
+                    //Number of hours Calculation
+                    DateTime currentDate = DateTime.now();
+                    print('current Date time: $currentDate');
+                    Duration diff = finaldate.difference(currentDate);
+
+                    hour = diff.inHours;
+                    minutes = diff.inMinutes;
+
+                    // print(currentDate);
+                    // print(selectedDate);
+                    print('hour and min ${hour} ${minutes}');
 
                     //Extracting Am Or Pm From time
                     String period = pickedTime!.period.toString();
                     String pr = period.substring(10, 12);
+                    // print(period);
 
-                    DateTime parsedTime = DateFormat.jm()
-                        .parse(pickedTime.format(context).toString());
+                    // DateTime parsedTime = DateFormat.jm()
+                    //     .parse(pickedTime!.format(context).toString());
                     String formattedTime =
-                        ' ${DateFormat('HH:mm').format(parsedTime)} $pr';
+                        ' ${pickedTime.hour}:${pickedTime.minute} $pr';
 
                     //  DateTime parsedTimeTwo = DateFormat.jm()
                     //     .parse(pickedTime!.format(context).toString());
@@ -336,11 +368,9 @@ class _HomepageState extends State<Homepage> {
 
                           // Create an alarm at 23:59
                           FlutterAlarmClock.createAlarm(
-                              int.parse(
-                                  _taskTimeController.text.substring(0, 3)),
-                              int.parse(
-                                  _taskTimeController.text.substring(4, 6)),
+                              hour as int, minutes as int,
                               title: _taskNameController.text);
+
                           Navigator.of(context).pop();
                           _taskNameController.text = '';
                           _taskTimeController.text = '';
@@ -373,8 +403,8 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Color colorbg1 =
-      Color(int.parse("#298BFF".substring(1, 7), radix: 16) + 0xFF000000);
+  Color colorbg1 = const Color(0xFF298BFF);
+  //Color(int.parse("#298BFF".substring(1, 7), radix: 16) + 0xFF000000);
   Color colorbg2 =
       Color(int.parse("#4189EA".substring(1, 7), radix: 16) + 0xFF000000);
   Color colorbg3 =
@@ -437,7 +467,7 @@ class _HomepageState extends State<Homepage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: ListView.builder(
-                      itemCount: _TodoList.length,
+                      itemCount: _todolist.length,
                       itemBuilder: (context, index) {
                         return Container(
                           margin: const EdgeInsets.only(left: 5.0, right: 5.0),
@@ -467,14 +497,14 @@ class _HomepageState extends State<Homepage> {
                                       ),
                                     ),
                                     title: Text(
-                                      _TodoList[index]['TASKNAME'],
+                                      _todolist[index]['TASKNAME'],
                                       style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     subtitle: Text(
-                                      _TodoList[index]['DESCRIPTION'],
+                                      _todolist[index]['DESCRIPTION'],
                                       style: const TextStyle(
                                           fontFamily: 'Inter',
                                           fontSize: 13,
@@ -495,7 +525,7 @@ class _HomepageState extends State<Homepage> {
                                       padding: const EdgeInsets.only(
                                           left: 16.0, bottom: 16.0),
                                       child: Text(
-                                        'Date: ${_TodoList[index]['DATE']}',
+                                        'Date: ${_todolist[index]['DATE']}',
                                         style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
@@ -506,7 +536,7 @@ class _HomepageState extends State<Homepage> {
                                       padding: const EdgeInsets.only(
                                           left: 8.0, bottom: 16.0),
                                       child: Text(
-                                        'Time: ${_TodoList[index]['TIME']}',
+                                        'Time: ${_todolist[index]['TIME']}',
                                         style: const TextStyle(
                                             fontFamily: 'Inter',
                                             fontSize: 12,
@@ -532,7 +562,7 @@ class _HomepageState extends State<Homepage> {
                                           backgroundColor: Colors.white,
                                           child: IconButton(
                                             onPressed: () {
-                                              showmodel(_TodoList[index]['ID']);
+                                              showmodel(_todolist[index]['ID']);
                                             },
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
@@ -561,8 +591,8 @@ class _HomepageState extends State<Homepage> {
                                             onPressed: () {
                                               showAlertDialog(
                                                   context,
-                                                  _TodoList[index]['ID'],
-                                                  _TodoList[index]['TASKNAME']);
+                                                  _todolist[index]['ID'],
+                                                  _todolist[index]['TASKNAME']);
                                             },
                                             icon: const Icon(
                                               Icons.delete,
