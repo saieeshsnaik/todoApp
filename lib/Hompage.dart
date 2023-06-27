@@ -1,3 +1,5 @@
+import 'dart:developer';
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -5,6 +7,9 @@ import 'package:indexed/indexed.dart';
 import 'package:todoapp/sqlhelper.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,8 +18,127 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   List<Map<String, dynamic>> _todolist = [];
   // bool _isLoading = true;
+
+  int id = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeNotifications();
+    tz.initializeTimeZones();
+    _refreshJournals();
+    Alarm.init();
+  }
+
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    bool? initialized = await flutterLocalNotificationsPlugin
+        .initialize(initializationSettings);
+    log("Iitialized:$initialized");
+  }
+
+  Future<void> scheduleAlarm(String tname, String tdescription) async {
+    var scheduledNotificationDateTime = selectedDateTime;
+    tz.Location timeZone = tz.getLocation('Asia/Kolkata');
+    tz.TZDateTime convertedDateTime =
+        tz.TZDateTime.from(selectedDateTime, timeZone);
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      tname,
+      tdescription,
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    // await flutterLocalNotificationsPlugin.show(
+    //     1, tname, tdescription, platformChannelSpecifics);
+
+    // final tzdatetime =
+    //     tz.TZDateTime.from(scheduledNotificationDateTime, tz.local);
+    print("$convertedDateTime");
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      tname,
+      tdescription,
+      convertedDateTime,
+      platformChannelSpecifics,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.wallClockTime,
+      payload: 'alarm_payload',
+    );
+
+    print(convertedDateTime);
+
+    // final alarmSettings = AlarmSettings(
+    //   id: id,
+    //   dateTime: selectedDateTime,
+    //   assetAudioPath: 'Assets/music/BabyShark.mp3',
+    //   loopAudio: true,
+    //   vibrate: true,
+    //   fadeDuration: 3.0,
+    //   notificationTitle: tname,
+    //   notificationBody: tdescription,
+    //   enableNotificationOnKill: true,
+    // );
+
+    // Alarm.set(alarmSettings: alarmSettings);
+    // print('Alaram Set');
+
+    var diff = selectedDateTime.difference(DateTime.now());
+
+    int hourSelected = diff.inHours.remainder(24);
+
+    int minSelected = diff.inMinutes.remainder(60);
+
+    int hourCurrent = DateTime.now().hour;
+    int minCurrent = DateTime.now().minute;
+    int totalHour = hourCurrent + hourSelected;
+    int totalMin = minCurrent + minSelected + 1;
+
+    print('$totalHour $totalMin');
+    FlutterAlarmClock.createAlarm(totalHour, totalMin, title: tname);
+    id += 1;
+  }
+
+  static ontask() {
+    print('Task Running');
+  }
+
+  String timeUntilAlarm = '';
+  void calculateTimeUntilAlarm() {
+    if (selectedDateTime != null) {
+      var difference = selectedDateTime.difference(DateTime.now());
+      var timeLeft = '';
+      if (difference.inDays > 0) {
+        timeLeft += '${difference.inDays}d ';
+      }
+      if (difference.inHours > 0) {
+        timeLeft += '${difference.inHours.remainder(24)}h ';
+      }
+      if (difference.inMinutes > 0) {
+        timeLeft += '${difference.inMinutes.remainder(60)}m ';
+      }
+      if (difference.inSeconds > 0) {
+        timeLeft += '${difference.inSeconds.remainder(60)}s ';
+      }
+      setState(() {
+        timeUntilAlarm = timeLeft;
+        // print('time until alaram $timeUntilAlarm');
+        // print('time left  $timeLeft');
+      });
+    }
+  }
 
   void _refreshJournals() async {
     final data = await SQLHelper.getItems();
@@ -22,12 +146,6 @@ class _HomePageState extends State<HomePage> {
       _todolist = data;
       // _isLoading = false;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshJournals();
   }
 
   Future<void> _addItem() async {
@@ -116,7 +234,8 @@ class _HomePageState extends State<HomePage> {
 
   late String selectedDate;
   late String selectedTime;
-  // late DateTime finaldate;
+  late DateTime selectedDateTime;
+  late DateTime pickedDate;
   late int hour;
   late int minutes;
   void showmodel([int? id]) async {
@@ -227,12 +346,12 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.blue.shade300,
                         icon: const Icon(Icons.calendar_month),
                         onPressed: () async {
-                          DateTime? pickedDate = await showDatePicker(
+                          pickedDate = (await showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2100),
-                          );
+                          ))!;
 
                           selectedDate = pickedDate.toString().substring(0, 10);
                           print("Selectec date $selectedDate");
@@ -282,27 +401,62 @@ class _HomePageState extends State<HomePage> {
                       context: context,
                     );
                     print(pickedTime);
-                    selectedTime =
-                        '${pickedTime!.hour}:${pickedTime.minute}:00';
-                    print("Selected Time$selectedTime");
 
-                    String mergeDateTime = '${selectedDate} ${selectedTime}';
+                    setState(() {
+                      selectedDateTime = DateTime(
+                        pickedDate.year,
+                        pickedDate.month,
+                        pickedDate.day,
+                        pickedTime!.hour,
+                        pickedTime.minute,
+                      );
+                      calculateTimeUntilAlarm();
+                    });
+
+                    // if (pickedTime!.hour >= 0 &&
+                    //     pickedTime.hour <= 9 &&
+                    //     pickedTime.minute >= 0 &&
+                    //     pickedTime.minute <= 9) {
+                    //   selectedTime =
+                    //       '0${pickedTime!.hour}:0${pickedTime.minute}:00';
+                    // } else if (pickedTime!.hour >= 0 && pickedTime.hour <= 9) {
+                    //   selectedTime =
+                    //       '0${pickedTime!.hour}:${pickedTime.minute}:00';
+                    // } else {
+                    //   selectedTime =
+                    //       '${pickedTime!.hour}:${pickedTime.minute}:00';
+                    // }
+
+                    // print("Selected Time$selectedTime");
+
+                    // String mergeDateTime = '${selectedDate} ${selectedTime}';
 
                     // finaldate = DateTime.parse(mergeDateTime);
 
-                    print('Final Slected Date time:  $finaldate');
+                    // print('Final Slected Date time:  $finaldate');
 
-                    //Number of hours Calculation
-                    DateTime currentDate = DateTime.now();
-                    print('current Date time: $currentDate');
-                    Duration diff = finaldate.difference(currentDate);
+                    // //Number of hours Calculation
+                    // DateTime currentDate = DateTime.now();
+                    // print('current Date time: $currentDate');
+                    // Duration diff = finaldate.difference(currentDate);
 
-                    hour = diff.inHours;
-                    minutes = diff.inMinutes;
+                    // String difference = diff.toString();
+                    // print('diff $difference');
 
-                    // print(currentDate);
-                    // print(selectedDate);
-                    print('hour and min ${hour} ${minutes}');
+                    // if (difference.startsWith('0', 0)) {
+                    //   hour = 0;
+                    //   minutes = int.parse(difference.substring(2, 4));
+                    // } else {
+                    //   hour = int.parse(difference.substring(0, 2));
+                    //   minutes = int.parse(difference.substring(3, 5));
+                    // }
+
+                    // hour = diff.inHours;
+                    // minutes = diff.inMinutes.remainder(60);
+
+                    // print('hour and min ${hour} ${minutes}');
+
+                    // print('Difference is $difference');
 
                     //Extracting Am Or Pm From time
                     String period = pickedTime!.period.toString();
@@ -366,10 +520,8 @@ class _HomePageState extends State<HomePage> {
                         if (id == null) {
                           _addItem();
 
-                          // Create an alarm at 23:59
-                          FlutterAlarmClock.createAlarm(
-                              hour as int, minutes as int,
-                              title: _taskNameController.text);
+                          scheduleAlarm(_taskNameController.value.text,
+                              _taskDescController.value.text);
 
                           Navigator.of(context).pop();
                           _taskNameController.text = '';
