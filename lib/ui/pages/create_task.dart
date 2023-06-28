@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/hompage.dart';
+import 'package:provider/provider.dart';
+import 'package:todoapp/provider/create_task_provider.dart';
+import 'package:todoapp/ui/pages/home_page.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -10,13 +12,21 @@ class CreateTask extends StatefulWidget {
 
 class _CreateTaskState extends State<CreateTask> {
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final createprovider =
+          Provider.of<CreateTaskProvider>(context, listen: false);
+
+      createprovider.assignValue(context);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        color: Colors.white,
-        child: SingleChildScrollView(
+      body: Consumer<CreateTaskProvider>(
+        builder: (context, createModel, child) => SingleChildScrollView(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(
@@ -36,13 +46,7 @@ class _CreateTaskState extends State<CreateTask> {
                     child: BackButton(
                       color: Colors.grey.shade400,
                       onPressed: () {
-                        setState(() {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomePage(),
-                              ));
-                        });
+                        Navigator.pop(context);
                       },
                     ),
                   ),
@@ -77,6 +81,7 @@ class _CreateTaskState extends State<CreateTask> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: createModel.taskNameController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
@@ -98,6 +103,7 @@ class _CreateTaskState extends State<CreateTask> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: createModel.taskDateController,
                   decoration: InputDecoration(
                       suffixIcon: IconButton(
                         iconSize: 30,
@@ -128,6 +134,7 @@ class _CreateTaskState extends State<CreateTask> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: createModel.taskTimeController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -150,6 +157,7 @@ class _CreateTaskState extends State<CreateTask> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: createModel.taskDescController,
                   maxLines: 5,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -168,16 +176,12 @@ class _CreateTaskState extends State<CreateTask> {
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ));
-                      });
+                    onPressed: () async {
+                      await createModel.onButtonClick(context);
                     },
-                    child: const Text('Create Task'),
+                    child: Text(createModel.recievedTask != null
+                        ? 'Update Task'
+                        : 'Create Task'),
                   ),
                 ),
               ),

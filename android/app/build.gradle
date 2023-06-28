@@ -26,6 +26,15 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    flavorDimensions "app"
+    productFlavors {
+        PROD {
+            dimension "app"
+        }
+        UAT {
+            dimension "app"
+        }
+    }
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
