@@ -1,7 +1,10 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/provider/create_task_provider.dart';
 import 'package:todoapp/ui/pages/home_page.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -18,7 +21,11 @@ class _CreateTaskState extends State<CreateTask> {
           Provider.of<CreateTaskProvider>(context, listen: false);
 
       createprovider.assignValue(context);
+
+      createprovider.initializeNotifications();
+      tz.initializeTimeZones();
     });
+    Alarm.init(); //Initializing Alaram
     super.initState();
   }
 
@@ -119,6 +126,7 @@ class _CreateTaskState extends State<CreateTask> {
                       hintText: 'YYYY-MM-DD',
                       hintStyle: const TextStyle(
                           fontFamily: 'Inter', fontWeight: FontWeight.w500)),
+                  onTap: () async => await createModel.datePicker(context),
                 ),
               ),
               const Padding(
@@ -142,6 +150,7 @@ class _CreateTaskState extends State<CreateTask> {
                       hintText: 'HH:MM:SS',
                       hintStyle: const TextStyle(
                           fontFamily: 'Inter', fontWeight: FontWeight.w500)),
+                  onTap: () async => await createModel.timePicker(context),
                 ),
               ),
               const Padding(
@@ -177,7 +186,7 @@ class _CreateTaskState extends State<CreateTask> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await createModel.onButtonClick(context);
+                      createModel.onButtonClick(context);
                     },
                     child: Text(createModel.recievedTask != null
                         ? 'Update Task'

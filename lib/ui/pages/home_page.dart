@@ -5,8 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+
 import 'package:todoapp/provider/home_page_provider.dart';
 
 import '../../utils/db_opt/sqlhelper.dart';
@@ -18,9 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   // bool _isLoading = true;
 
   int id = 1;
@@ -37,83 +33,6 @@ class _HomePageState extends State<HomePage> {
     // initializeNotifications();
     // tz.initializeTimeZones();
     // // _refreshJournals();
-    // Alarm.init();
-  }
-
-  void initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    bool? initialized = await flutterLocalNotificationsPlugin
-        .initialize(initializationSettings);
-    log("Iitialized:$initialized");
-  }
-
-  Future<void> scheduleAlarm(String tname, String tdescription) async {
-    var scheduledNotificationDateTime = selectedDateTime;
-    tz.Location timeZone = tz.getLocation('Asia/Kolkata');
-    tz.TZDateTime convertedDateTime =
-        tz.TZDateTime.from(selectedDateTime, timeZone);
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      tname,
-      tdescription,
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    // await flutterLocalNotificationsPlugin.show(
-    //     1, tname, tdescription, platformChannelSpecifics);
-
-    // final tzdatetime =
-    //     tz.TZDateTime.from(scheduledNotificationDateTime, tz.local);
-    print("$convertedDateTime");
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      tname,
-      tdescription,
-      convertedDateTime,
-      platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.wallClockTime,
-      payload: 'alarm_payload',
-    );
-
-    print(convertedDateTime);
-
-    // final alarmSettings = AlarmSettings(
-    //   id: id,
-    //   dateTime: selectedDateTime,
-    //   assetAudioPath: 'Assets/music/BabyShark.mp3',
-    //   loopAudio: true,
-    //   vibrate: true,
-    //   fadeDuration: 3.0,
-    //   notificationTitle: tname,
-    //   notificationBody: tdescription,
-    //   enableNotificationOnKill: true,
-    // );
-
-    // Alarm.set(alarmSettings: alarmSettings);
-    // print('Alaram Set');
-
-    var diff = selectedDateTime.difference(DateTime.now());
-
-    int hourSelected = diff.inHours.remainder(24);
-
-    int minSelected = diff.inMinutes.remainder(60);
-
-    int hourCurrent = DateTime.now().hour;
-    int minCurrent = DateTime.now().minute;
-    int totalHour = hourCurrent + hourSelected;
-    int totalMin = minCurrent + minSelected + 1;
-
-    print('$totalHour $totalMin');
-    FlutterAlarmClock.createAlarm(totalHour, totalMin, title: tname);
-    id += 1;
   }
 
   static ontask() {
@@ -166,68 +85,8 @@ class _HomePageState extends State<HomePage> {
   // }
 
   //detete method
-  void _deleteitem(int id, String taskname) async {
-    await SQLHelper.deleteItem(id);
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          '$taskname Task Deleted!',
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
-        ),
-        backgroundColor: colorbg1));
-    // AlertDialog(
-    //   title: const Text(''),
-    //   content: Text('Task "$taskname" Deleted Successfully! '),
-    //   actions: <Widget>[
-    //     TextButton(
-    //       onPressed: () => Navigator.pop(context, 'Cancel'),
-    //       child: const Text('Cancel'),
-    //     ),
-    //     TextButton(
-    //       onPressed: () => Navigator.pop(context, 'OK'),
-    //       child: const Text('OK'),
-    //     ),
-    //   ],
-    // );
-
-    // _refreshJournals();
-  }
 
   // var parsedDate = DateTime.parse('1974-03-20 00:00:00.000');
-
-  showAlertDialog(BuildContext context, int idtask, String taskName) {
-    // set up the buttons
-    Widget cancelButton = ElevatedButton(
-      child: const Text("No"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-    Widget continueButton = ElevatedButton(
-      child: const Text("Yes"),
-      onPressed: () {
-        _deleteitem(idtask, taskName);
-        Navigator.of(context).pop();
-      },
-    );
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: const Text("Alert!"),
-      content: Text('Would you like to Delete Task "$taskName"'),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
 
   late String selectedDate;
   late String selectedTime;
@@ -328,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                                               margin: const EdgeInsets.all(8.0),
                                               child: const ImageIcon(
                                                 AssetImage(
-                                                    'Assets/icons/list_icon.png'),
+                                                    'assets/icons/list_icon.png'),
                                                 color: Colors.white,
                                               ),
                                             ),
@@ -434,7 +293,16 @@ class _HomePageState extends State<HomePage> {
                                                 radius: 15,
                                                 backgroundColor: Colors.white,
                                                 child: IconButton(
-                                                  onPressed: () {
+                                                  onPressed: () async {
+                                                    await taskModel
+                                                        .showAlertDialog(
+                                                            context,
+                                                            taskModel
+                                                                .todolist[index]
+                                                                .id,
+                                                            taskModel
+                                                                .todolist[index]
+                                                                .title);
                                                     // showAlertDialog(
                                                     //     context,
                                                     //     _todolist[index]['ID'],
