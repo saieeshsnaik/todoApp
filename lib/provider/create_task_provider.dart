@@ -10,7 +10,9 @@ import 'package:todoapp/models/data_models/task.dart';
 import 'package:todoapp/utils/db_opt/sqlhelper.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-class CreateTaskProvider extends ChangeNotifier {
+import '../utils/validation/validation.dart';
+
+class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   Task? recievedTask;

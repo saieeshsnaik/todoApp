@@ -1,10 +1,8 @@
-import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:todoapp/provider/create_task_provider.dart';
 import 'package:todoapp/ui/pages/home_page.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:todoapp/utils/validation/validation.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -21,11 +19,7 @@ class _CreateTaskState extends State<CreateTask> {
           Provider.of<CreateTaskProvider>(context, listen: false);
 
       createprovider.assignValue(context);
-
-      createprovider.initializeNotifications();
-      tz.initializeTimeZones();
     });
-    Alarm.init(); //Initializing Alaram
     super.initState();
   }
 
@@ -87,15 +81,23 @@ class _CreateTaskState extends State<CreateTask> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: createModel.taskNameController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.grey.shade100)),
-                    hintText: '',
-                  ),
-                ),
+                child: StreamBuilder(
+                    stream: createModel.name,
+                    builder: (context, snapshot) {
+                      return TextField(
+                        controller: createModel.taskNameController,
+                        onChanged: (value) => createModel.sinkName.add(value),
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade100)),
+                            hintText: 'Task Name',
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null),
+                      );
+                    }),
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -109,25 +111,36 @@ class _CreateTaskState extends State<CreateTask> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: createModel.taskDateController,
-                  decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        iconSize: 30,
-                        color: Colors.blue.shade300,
-                        icon: const Icon(Icons.calendar_month),
-                        onPressed: () {
-                          // Icon Calender Acction
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.grey.shade100)),
-                      hintText: 'YYYY-MM-DD',
-                      hintStyle: const TextStyle(
-                          fontFamily: 'Inter', fontWeight: FontWeight.w500)),
-                  onTap: () async => await createModel.datePicker(context),
-                ),
+                child: StreamBuilder<Object>(
+                    stream: createModel.date,
+                    builder: (context, snapshot) {
+                      return TextField(
+                        controller: createModel.taskDateController,
+                        onChanged: (value) => createModel.sinkDate.add(value),
+                        decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              iconSize: 30,
+                              color: Colors.blue.shade300,
+                              icon: const Icon(Icons.calendar_month),
+                              onPressed: () {
+                                // Icon Calender Acction
+                              },
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade100)),
+                            hintText: 'YYYY-MM-DD',
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            hintStyle: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500)),
+                        onTap: () async =>
+                            await createModel.datePicker(context),
+                      );
+                    }),
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -141,17 +154,28 @@ class _CreateTaskState extends State<CreateTask> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: createModel.taskTimeController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.grey.shade100)),
-                      hintText: 'HH:MM:SS',
-                      hintStyle: const TextStyle(
-                          fontFamily: 'Inter', fontWeight: FontWeight.w500)),
-                  onTap: () async => await createModel.timePicker(context),
-                ),
+                child: StreamBuilder<Object>(
+                    stream: createModel.time,
+                    builder: (context, snapshot) {
+                      return TextField(
+                        controller: createModel.taskTimeController,
+                        onChanged: (value) => createModel.sinkTime.add(value),
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade100)),
+                            hintText: 'HH:MM:SS',
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            hintStyle: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500)),
+                        onTap: () async =>
+                            await createModel.timePicker(context),
+                      );
+                    }),
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -165,16 +189,25 @@ class _CreateTaskState extends State<CreateTask> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: createModel.taskDescController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.grey.shade100)),
-                    hintText: 'Description',
-                  ),
-                ),
+                child: StreamBuilder<Object>(
+                    stream: createModel.desc,
+                    builder: (context, snapshot) {
+                      return TextField(
+                        controller: createModel.taskDescController,
+                        onChanged: (value) => createModel.sinkDesc.add(value),
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade100)),
+                          hintText: 'Description',
+                          errorText: snapshot.hasError
+                              ? snapshot.error.toString()
+                              : null,
+                        ),
+                      );
+                    }),
               ),
               const SizedBox(
                 height: 40,
@@ -184,14 +217,20 @@ class _CreateTaskState extends State<CreateTask> {
                 child: SizedBox(
                   height: 50,
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      createModel.onButtonClick(context);
-                    },
-                    child: Text(createModel.recievedTask != null
-                        ? 'Update Task'
-                        : 'Create Task'),
-                  ),
+                  child: StreamBuilder(
+                      stream: createModel.submitValid,
+                      builder: (context, snapshot) {
+                        return ElevatedButton(
+                          onPressed: snapshot.data != true
+                              ? () {}
+                              : () async {
+                                  await createModel.onButtonClick(context);
+                                },
+                          child: Text(createModel.recievedTask != null
+                              ? 'Update Task'
+                              : 'Create Task'),
+                        );
+                      }),
                 ),
               ),
             ]),
