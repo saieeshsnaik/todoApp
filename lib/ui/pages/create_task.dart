@@ -86,7 +86,7 @@ class _CreateTaskState extends State<CreateTask> {
                     builder: (context, snapshot) {
                       return TextField(
                         controller: createModel.taskNameController,
-                        onChanged: (value) => createModel.sinkName.add(value),
+                        onChanged: createModel.changeName,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
@@ -116,7 +116,7 @@ class _CreateTaskState extends State<CreateTask> {
                     builder: (context, snapshot) {
                       return TextField(
                         controller: createModel.taskDateController,
-                        onChanged: (value) => createModel.sinkDate.add(value),
+                        onChanged: createModel.changeDate,
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               iconSize: 30,
@@ -159,7 +159,7 @@ class _CreateTaskState extends State<CreateTask> {
                     builder: (context, snapshot) {
                       return TextField(
                         controller: createModel.taskTimeController,
-                        onChanged: (value) => createModel.sinkTime.add(value),
+                        onChanged: createModel.changeTime,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
@@ -194,7 +194,7 @@ class _CreateTaskState extends State<CreateTask> {
                     builder: (context, snapshot) {
                       return TextField(
                         controller: createModel.taskDescController,
-                        onChanged: (value) => createModel.sinkDesc.add(value),
+                        onChanged: createModel.changeDesc,
                         maxLines: 5,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
@@ -217,15 +217,13 @@ class _CreateTaskState extends State<CreateTask> {
                 child: SizedBox(
                   height: 50,
                   width: double.infinity,
-                  child: StreamBuilder(
+                  child: StreamBuilder<bool>(
                       stream: createModel.submitValid,
                       builder: (context, snapshot) {
                         return ElevatedButton(
-                          onPressed: snapshot.data != true
-                              ? () {}
-                              : () async {
-                                  await createModel.onButtonClick(context);
-                                },
+                          onPressed: !snapshot.hasData
+                              ? null
+                              : () async => createModel.onButtonClick(context),
                           child: Text(createModel.recievedTask != null
                               ? 'Update Task'
                               : 'Create Task'),

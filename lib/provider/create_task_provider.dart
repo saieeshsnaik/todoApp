@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:todoapp/models/data_models/task.dart';
 import 'package:todoapp/utils/db_opt/sqlhelper.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -26,6 +27,30 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
   final TextEditingController taskDescController = TextEditingController();
   final TextEditingController taskDateController = TextEditingController();
   final TextEditingController taskTimeController = TextEditingController();
+
+  //streams get and set
+  final _name = BehaviorSubject<String>();
+  final _date = BehaviorSubject<String>();
+  final _time = BehaviorSubject<String>();
+  final _desc = BehaviorSubject<String>();
+
+  Stream<String> get name => _name.stream.transform(validateName);
+  Stream<String> get date => _date.stream.transform(validateDate);
+  Stream<String> get time => _time.stream.transform(validateTime);
+  Stream<String> get desc => _desc.stream.transform(validateDesc);
+
+  Stream<bool> get submitValid =>
+      Rx.combineLatest4(name, date, time, desc, (e, m, t, d) => true);
+
+  // Sink<String> get sinkName => _name.sink;
+  // Sink<String> get sinkDate => _date.sink;
+  // Sink<String> get sinkTime => _time.sink;
+  // Sink<String> get sinkDesc => _desc.sink;
+
+  Function(String) get changeName => _name.sink.add;
+  Function(String) get changeDate => _date.sink.add;
+  Function(String) get changeTime => _time.sink.add;
+  Function(String) get changeDesc => _desc.sink.add;
 
   Future<void> addItem(BuildContext context) async {
     await SQLHelper.createItem(
@@ -80,6 +105,7 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
 
     String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate!);
     taskDateController.text = formattedDate;
+    changeDate(formattedDate);
   }
 
   Future<void> timePicker(BuildContext context) async {
@@ -90,27 +116,29 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
     if (kDebugMode) {
       print(pickedTime);
     }
-    if (pickedTime != null) {}
-    selectedDateTime = DateTime(
-      pickedDate!.year,
-      pickedDate!.month,
-      pickedDate!.day,
-      pickedTime!.hour,
-      pickedTime.minute,
-    );
-    taskTimeController.text = pickedTime!.format(context);
+    if (pickedTime != null && context.mounted) {
+      selectedDateTime = DateTime(
+        pickedDate!.year,
+        pickedDate!.month,
+        pickedDate!.day,
+        pickedTime!.hour,
+        pickedTime.minute,
+      );
+      taskTimeController.text = pickedTime.format(context);
+      changeTime(pickedTime.format(context));
+    }
   }
 
-  void initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+  // void initializeNotifications() async {
+  //   const AndroidInitializationSettings initializationSettingsAndroid =
+  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+  //   const InitializationSettings initializationSettings =
+  //       InitializationSettings(android: initializationSettingsAndroid);
 
-    bool? initialized = await flutterLocalNotificationsPlugin
-        .initialize(initializationSettings);
-    log("Iitialized:$initialized");
-  }
+  //   bool? initialized = await flutterLocalNotificationsPlugin
+  //       .initialize(initializationSettings);
+  //   log("Iitialized:$initialized");
+  // }
 
   Future<void> scheduleAlarm(String tname, String tdescription) async {
     var scheduledNotificationDateTime = selectedDateTime;
