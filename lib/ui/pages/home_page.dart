@@ -1,14 +1,10 @@
-import 'dart:developer';
-import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todoapp/provider/home_page_provider.dart';
 
-import '../../utils/db_opt/sqlhelper.dart';
+import '../../services/notification_services.dart';
+// import '../../utils/db_opt/sqlhelper.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,8 +15,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // bool _isLoading = true;
 
-  int id = 1;
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -29,15 +23,17 @@ class _HomePageState extends State<HomePage> {
       // homeprovider.addItem();
       homeprovider.refreshJournals();
     });
+    NotificationService().initNotification();
+
     super.initState();
     // initializeNotifications();
-    // tz.initializeTimeZones();
+
     // // _refreshJournals();
   }
 
-  static ontask() {
-    print('Task Running');
-  }
+  // static ontask() {
+  //   print('Task Running');
+  // }
 
   String timeUntilAlarm = '';
   void calculateTimeUntilAlarm() {
@@ -64,14 +60,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _addItem() async {
-    await SQLHelper.createItem(
-        _taskNameController.value.text,
-        _taskDescController.value.text,
-        _taskDateController.value.text,
-        _taskTimeController.value.text);
-    // _refreshJournals();
-  }
+  // Future<void> _addItem() async {
+  //   await SQLHelper.createItem(
+  //       _taskNameController.value.text,
+  //       _taskDescController.value.text,
+  //       _taskDateController.value.text,
+  //       _taskTimeController.value.text);
+  //   // _refreshJournals();
+  // }
 
   //update item
   // Future<void> __updateItem(int id) async {
@@ -106,10 +102,10 @@ class _HomePageState extends State<HomePage> {
       Color(int.parse("#3787EB".substring(1, 7), radix: 16) + 0xFF000000);
 
   TextEditingController dateInput = TextEditingController();
-  final TextEditingController _taskNameController = TextEditingController();
-  final TextEditingController _taskDescController = TextEditingController();
-  final TextEditingController _taskDateController = TextEditingController();
-  final TextEditingController _taskTimeController = TextEditingController();
+  // final TextEditingController _taskNameController = TextEditingController();
+  // final TextEditingController _taskDescController = TextEditingController();
+  // final TextEditingController _taskDateController = TextEditingController();
+  // final TextEditingController _taskTimeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

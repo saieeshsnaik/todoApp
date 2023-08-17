@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 import 'package:todoapp/provider/create_task_provider.dart';
-import 'package:todoapp/ui/pages/home_page.dart';
-import 'package:todoapp/utils/validation/validation.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -20,6 +19,7 @@ class _CreateTaskState extends State<CreateTask> {
 
       createprovider.assignValue(context);
     });
+
     super.initState();
   }
 

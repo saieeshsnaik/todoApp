@@ -57,6 +57,14 @@ class SQLHelper {
     return result;
   }
 
+  static Future<int?> getId() async {
+    final db = await SQLHelper.db();
+    // Get the last record's ID
+    final result = await db.rawQuery('SELECT MAX(id) FROM TODOLIST');
+    final lastId = result.first.values.first as int?;
+    return lastId;
+  }
+
   static Future<void> deleteItem(int id) async {
     final db = await SQLHelper.db();
     try {

@@ -1,23 +1,18 @@
-import 'dart:developer';
+import 'dart:math';
 
-import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:todoapp/models/data_models/task.dart';
 import 'package:todoapp/utils/db_opt/sqlhelper.dart';
-import 'package:timezone/timezone.dart' as tz;
-
 import '../utils/validation/validation.dart';
+import 'package:todoapp/services/notification_services.dart';
 
 class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
   Task? recievedTask;
-  DateTime? selectedDateTime;
+
+  late DateTime selectedDateTime;
   set setRecievedTask(Task? val) {
     recievedTask = val;
     notifyListeners();
@@ -59,8 +54,11 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
       taskDateController.value.text,
       taskTimeController.value.text,
     );
-    await scheduleAlarm(
-        taskNameController.value.text, taskDescController.value.text);
+
+    int? recievedId = await SQLHelper.getId();
+
+    await notify(recievedId, taskNameController.value.text,
+        taskDescController.value.text);
 
     if (context.mounted) Navigator.pop(context);
   }
@@ -121,13 +119,23 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
         pickedDate!.year,
         pickedDate!.month,
         pickedDate!.day,
-        pickedTime!.hour,
+        pickedTime.hour,
         pickedTime.minute,
       );
       taskTimeController.text = pickedTime.format(context);
       changeTime(pickedTime.format(context));
+      print(selectedDateTime);
     }
   }
+
+  Future<void> notify(int? id, String tname, String tdesc) async {
+    NotificationService().scheduleNotification(
+        id: id!,
+        title: tname,
+        body: tdesc,
+        scheduledNotificationDateTime: selectedDateTime);
+  }
+}
 
   // void initializeNotifications() async {
   //   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -140,53 +148,53 @@ class CreateTaskProvider extends ChangeNotifier with CreateTaskValidator {
   //   log("Iitialized:$initialized");
   // }
 
-  Future<void> scheduleAlarm(String tname, String tdescription) async {
-    var scheduledNotificationDateTime = selectedDateTime;
-    tz.Location timeZone = tz.getLocation('Asia/Kolkata');
-    tz.TZDateTime convertedDateTime =
-        tz.TZDateTime.from(selectedDateTime!, timeZone);
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      tname,
-      tdescription,
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    if (kDebugMode) {
-      print("$convertedDateTime");
-    }
+  // Future<void> scheduleAlarm(String tname, String tdescription) async {
+  //   var scheduledNotificationDateTime = selectedDateTime;
+  //   tz.Location timeZone = tz.getLocation('Asia/Kolkata');
+  //   tz.TZDateTime convertedDateTime =
+  //       tz.TZDateTime.from(selectedDateTime!, timeZone);
+  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //     tname,
+  //     tdescription,
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //   );
+  //   var platformChannelSpecifics =
+  //       NotificationDetails(android: androidPlatformChannelSpecifics);
+  //   if (kDebugMode) {
+  //     print("$convertedDateTime");
+  //   }
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      tname,
-      tdescription,
-      convertedDateTime,
-      platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.wallClockTime,
-      payload: 'alarm_payload',
-    );
+  //   await flutterLocalNotificationsPlugin.zonedSchedule(
+  //     0,
+  //     tname,
+  //     tdescription,
+  //     convertedDateTime,
+  //     platformChannelSpecifics,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.wallClockTime,
+  //     payload: 'alarm_payload',
+  //   );
 
-    if (kDebugMode) {
-      print(convertedDateTime);
-    }
-    alaram(tname, tdescription);
-  }
+  //   if (kDebugMode) {
+  //     print(convertedDateTime);
+  //   }
+    
+  
 
-  Future<void> alaram(String tname, String tdescription) async {
-    final alarmSettings = AlarmSettings(
-      id: 0,
-      dateTime: selectedDateTime!,
-      assetAudioPath: 'assets/audio/baby_shark.mp3',
-      loopAudio: true,
-      vibrate: true,
-      fadeDuration: 0.0,
-      notificationTitle: tname,
-      notificationBody: tdescription,
-      enableNotificationOnKill: true,
-      stopOnNotificationOpen: true,
-    );
-    await Alarm.set(alarmSettings: alarmSettings);
-  }
-}
+  // Future<void> alaram(String tname, String tdescription) async {
+  //   final alarmSettings = AlarmSettings(
+  //     id: 0,
+  //     dateTime: selectedDateTime!,
+  //     assetAudioPath: 'assets/audio/baby_shark.mp3',
+  //     loopAudio: true,
+  //     vibrate: true,
+  //     fadeDuration: 0.0,
+  //     notificationTitle: tname,
+  //     notificationBody: tdescription,
+  //     enableNotificationOnKill: true,
+  //     stopOnNotificationOpen: true,
+  //   );
+  //   await Alarm.set(alarmSettings: alarmSettings);
+  // }
+
